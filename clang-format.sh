@@ -1,3 +1,3 @@
 #!/bin/sh
 
-find . -iname '*.h' -o -iname '*.cpp' | xargs clang-format -style=file -i -verbose
+find . -type f \( -iname '*.h' -o -iname '*.cpp' \) -not -path "*/bluez-5.41/*" | xargs clang-format -style=file -i -verbose
