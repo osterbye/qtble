@@ -4,6 +4,10 @@
 #include "qtble_types.h"
 #include <QObject>
 
+class QtBleAuth;
+class QtBleValue;
+class GattServer;
+
 class QTBLE_EXPORT QtBle : public QObject
 {
     Q_OBJECT
@@ -23,22 +27,23 @@ public:
           QObject *parent = nullptr);
 
     /**
-     * @brief Create a GATT service
+     * @brief Create a GATT service. New services will only be visible if created before server is
+     * started.
      * @param uuid Service UUID
      * @param authenticator Pointer to your authentication class or leave as nullptr to always allow
      * remote devices to access this service.
-     * @return Service index. Must be used when adding characteristics to the service.
+     * @return True if successful. False if another service with the supplied UUID already exist.
      */
-    quint8 createGattService(uuid128 uuid, QtBleAuth *authenticator = nullptr);
+    bool createGattService(uuid128 uuid, QtBleAuth *authenticator = nullptr);
 
     /**
-     * @brief Add a characteristic to a specific service
-     * @param serviceIndex The value returned from \a addGattService, of the service that you want
-     * to add the characteristic to.
+     * @brief Add a characteristic to a specific service. New characteristics will only be visible
+     * if created before server is started.
+     * @param serviceUuid The UUID of the service that you wish to add the characteristic to.
      * @param value Your class containing the value that you would like the characteristic to use.
-     * @return True if successful. False if service index is invalid.
+     * @return True if successful. False if no service with the supplied UUID exists.
      */
-    bool addCharacteristicToService(quint8 serviceIndex, QtBleValue *value);
+    bool addCharacteristicToService(uuid128 serviceUuid, QtBleValue *value);
 
     /**
      * @brief Can only be called when GATT server is stopped.
@@ -69,6 +74,9 @@ signals:
      * @param state GATT server state
      */
     void gattStateChanged(GATT_SERVER_STATE state);
+
+private:
+    GattServer *m_gattServer;
 };
 
 #endif // QTBLE_H

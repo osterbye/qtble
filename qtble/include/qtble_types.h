@@ -4,9 +4,6 @@
 #include <QMetaType>
 #include <QVector>
 
-class QtBleAuth;
-class QtBleValue;
-
 enum GATT_SERVER_STATE {
     GATT_STATE_ERROR,
     GATT_STATE_OFF,
@@ -17,16 +14,10 @@ enum GATT_SERVER_STATE {
 };
 Q_DECLARE_METATYPE(GATT_SERVER_STATE);
 
-typedef struct {
+struct uuid128 {
     QVector<quint8> attributeUuid;
-} uuid128;
-
-/*typedef struct {
-    uuid128 serviceUuid;
-    QtBleAuth *authenticator;
-    QVector<QtBleValue *> values;
-} gattService;
-Q_DECLARE_METATYPE(gattService);*/
+    bool operator==(const uuid128 &a) const { return (attributeUuid == a.attributeUuid); }
+};
 
 const int uuidServiceIndex = 2;
 const int uuidCharacteristicIndex = 3;

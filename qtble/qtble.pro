@@ -10,6 +10,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 INCLUDEPATH += \
     include/ \
+    src/ \
     bluez-5.41/
 
 # Public headers
@@ -22,8 +23,25 @@ HEADERS += \
 
 # Source
 SOURCES += \
+    src/advertising.cpp \
+    src/blecharacteristic.cpp \
+    src/bleservice.cpp \
+    src/btatt.cpp \
+    src/btsocket.cpp \
+    src/btuuid.cpp \
+    src/gattserver.cpp \
     src/qtble.cpp \
     src/qtblevalue.cpp
+
+HEADERS += \
+    src/advertising.h \
+    src/blecharacteristic.h \
+    src/bleservice.h \
+    src/btatt.h \
+    src/btsocket.h \
+    src/btuuid.h \
+    src/gattserver.h \
+    src/gattservice.h
 
 LIBS += -lbluetooth -lshared-glib
 

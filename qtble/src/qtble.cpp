@@ -1,22 +1,24 @@
 #include "qtble.h"
-#include "qtble_types.h"
+#include "gattserver.h"
 
 QtBle::QtBle(QString deviceName, QString deviceManufacturer, quint16 deviceAppearance,
              QObject *parent)
     : QObject(parent)
 {
     qRegisterMetaType<GATT_SERVER_STATE>();
-    qRegisterMetaType<gattService>();
+
+    m_gattServer = new GattServer(deviceName, deviceManufacturer, deviceAppearance, this);
+    connect(m_gattServer, &GattServer::gattStateChanged, this, &QtBle::gattStateChanged);
 }
 
-quint8 QtBle::createGattService(uuid128 uuid, QtBleAuth *authenticator)
+bool QtBle::createGattService(uuid128 uuid, QtBleAuth *authenticator)
 {
-    m_gattServer->addGattService(uuid);
+    return m_gattServer->createService(uuid, authenticator);
 }
 
-bool QtBle::addCharacteristicToService(quint8 serviceIndex, QtBleValue *value)
+bool QtBle::addCharacteristicToService(uuid128 serviceUuid, QtBleValue *value)
 {
-    m_gattServer->addCharacteristicToService(quint8 serviceIndex, QtBleValue * value);
+    return m_gattServer->addCharacteristicToService(serviceUuid, value);
 }
 
 void QtBle::clearGattServices()
