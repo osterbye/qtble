@@ -3,10 +3,8 @@
 // BlueZ shared local copy
 extern "C" {
 #include "uuid.h"
-#include "src/shared/att.h"
 #include "src/shared/gatt-db.h"
 #include "src/shared/gatt-server.h"
-#include "src/shared/util.h"
 }
 
 #include "qtbleauth.h"
