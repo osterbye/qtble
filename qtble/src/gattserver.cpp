@@ -87,8 +87,11 @@ bool GattServer::addCharacteristicToService(uuid128 serviceUuid, QtBleValue *val
         }
     }
 
-    if (nullptr == service)
+    if (nullptr == service) {
+        GS_D("Failed to add characteristic. Service UUID " << serviceUuid.attributeUuid
+                                                           << " not found!");
         return false;
+    }
 
     service->values.append(value);
 
@@ -149,6 +152,7 @@ void GattServer::startService()
     if (!createServer()) {
         stop();
         setState(GATT_STATE_ERROR);
+        GS_D("Failed to create server");
         return;
     }
 
