@@ -70,8 +70,8 @@ BleCharacteristic::BleCharacteristic(QtBleValue *value, QtBleAuth *auth, bt_gatt
     connect(value, &QtBleValue::notify, this, &BleCharacteristic::notify);
 }
 
-void BleCharacteristic::read(struct gatt_db_attribute *attrib, unsigned int id, uint16_t offset,
-                             uint8_t opcode, struct bt_att *att, void *user_data)
+void BleCharacteristic::read(struct gatt_db_attribute *attrib, unsigned int id, quint16 offset,
+                             quint8 opcode, struct bt_att *att, void *user_data)
 {
     Q_UNUSED(opcode)
     Q_UNUSED(att)
@@ -79,7 +79,7 @@ void BleCharacteristic::read(struct gatt_db_attribute *attrib, unsigned int id, 
     BLEC_D(__PRETTY_FUNCTION__);
 
     quint8 error = 0;
-    const uint8_t *value = NULL;
+    const quint8 *value = NULL;
     size_t len = 0;
     BleCharacteristic *t = static_cast<BleCharacteristic *>(user_data);
     if (!t->p_auth->isAuthorized()
@@ -94,7 +94,7 @@ void BleCharacteristic::read(struct gatt_db_attribute *attrib, unsigned int id, 
         if (0 == error) {
             len = t->p_value->read().length();
             len -= offset;
-            value = reinterpret_cast<const uint8_t *>(t->p_value->read().constData());
+            value = reinterpret_cast<const quint8 *>(t->p_value->read().constData());
             value += offset;
         } else {
             BLEC_D("Error: read offset:" << offset << ">=" << t->p_value->read().length());
@@ -106,8 +106,8 @@ void BleCharacteristic::read(struct gatt_db_attribute *attrib, unsigned int id, 
     gatt_db_attribute_read_result(attrib, id, error, value, len);
 }
 
-void BleCharacteristic::write(struct gatt_db_attribute *attrib, unsigned int id, uint16_t offset,
-                              const uint8_t *value, size_t len, uint8_t opcode, struct bt_att *att,
+void BleCharacteristic::write(struct gatt_db_attribute *attrib, unsigned int id, quint16 offset,
+                              const quint8 *value, size_t len, quint8 opcode, struct bt_att *att,
                               void *user_data)
 {
     Q_UNUSED(offset)
@@ -141,8 +141,8 @@ void BleCharacteristic::indicationCb(void *user_data)
     t->p_value->indicationReply();
 }
 
-void BleCharacteristic::cccRead(struct gatt_db_attribute *attrib, unsigned int id, uint16_t offset,
-                                uint8_t opcode, struct bt_att *att, void *user_data)
+void BleCharacteristic::cccRead(struct gatt_db_attribute *attrib, unsigned int id, quint16 offset,
+                                quint8 opcode, struct bt_att *att, void *user_data)
 {
     Q_UNUSED(offset)
     Q_UNUSED(opcode)
@@ -151,16 +151,16 @@ void BleCharacteristic::cccRead(struct gatt_db_attribute *attrib, unsigned int i
     BLEC_D(__PRETTY_FUNCTION__);
 
     BleCharacteristic *t = static_cast<BleCharacteristic *>(user_data);
-    uint8_t value[2];
+    quint8 value[2];
     value[0] = t->m_ccc;
     value[1] = 0x00;
 
     gatt_db_attribute_read_result(attrib, id, 0, value, sizeof(value));
 }
 
-void BleCharacteristic::cccWrite(struct gatt_db_attribute *attrib, unsigned int id, uint16_t offset,
-                                 const uint8_t *value, size_t len, uint8_t opcode,
-                                 struct bt_att *att, void *user_data)
+void BleCharacteristic::cccWrite(struct gatt_db_attribute *attrib, unsigned int id, quint16 offset,
+                                 const quint8 *value, size_t len, quint8 opcode, struct bt_att *att,
+                                 void *user_data)
 {
     Q_UNUSED(opcode)
     Q_UNUSED(att)
@@ -195,7 +195,7 @@ void BleCharacteristic::notify()
     QByteArray ba = p_value->read();
     size_t len = ba.length();
     if (len > 0) {
-        const uint8_t *value = reinterpret_cast<const uint8_t *>(ba.constData());
+        const quint8 *value = reinterpret_cast<const quint8 *>(ba.constData());
         if (1 == m_ccc
             && (QtBleValue::NOTI_NOTIFY == p_value->notificationPermissions()
                 || QtBleValue::NOTI_INDICATE_AND_NOTIFY == p_value->notificationPermissions())) {

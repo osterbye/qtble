@@ -19,22 +19,22 @@ public:
     /**
      * @brief This function is called when remote device wants to read an attribute value
      */
-    static void read(struct gatt_db_attribute *attrib, unsigned int id, uint16_t offset,
-                     uint8_t opcode, struct bt_att *att, void *user_data);
+    static void read(struct gatt_db_attribute *attrib, unsigned int id, quint16 offset,
+                     quint8 opcode, struct bt_att *att, void *user_data);
 
     /**
      * @brief This function is called when remote device wants to update an attribute value
      */
-    static void write(struct gatt_db_attribute *attrib, unsigned int id, uint16_t offset,
-                      const uint8_t *value, size_t len, uint8_t opcode, struct bt_att *att,
+    static void write(struct gatt_db_attribute *attrib, unsigned int id, quint16 offset,
+                      const quint8 *value, size_t len, quint8 opcode, struct bt_att *att,
                       void *user_data);
 
     static void indicationCb(void *user_data);
 
-    static void cccRead(struct gatt_db_attribute *attrib, unsigned int id, uint16_t offset,
-                        uint8_t opcode, struct bt_att *att, void *user_data);
-    static void cccWrite(struct gatt_db_attribute *attrib, unsigned int id, uint16_t offset,
-                         const uint8_t *value, size_t len, uint8_t opcode, struct bt_att *att,
+    static void cccRead(struct gatt_db_attribute *attrib, unsigned int id, quint16 offset,
+                        quint8 opcode, struct bt_att *att, void *user_data);
+    static void cccWrite(struct gatt_db_attribute *attrib, unsigned int id, quint16 offset,
+                         const quint8 *value, size_t len, quint8 opcode, struct bt_att *att,
                          void *user_data);
 private slots:
     void notify();

@@ -2,7 +2,7 @@
 
 BtUuid::BtUuid(QObject *parent) : QObject(parent) { }
 
-int BtUuid::btUuid16Create(bt_uuid_t *btuuid, uint16_t value)
+int BtUuid::btUuid16Create(bt_uuid_t *btuuid, quint16 value)
 {
     memset(btuuid, 0, sizeof(bt_uuid_t));
     btuuid->type = bt_uuid_t::BT_UUID16;
@@ -11,7 +11,7 @@ int BtUuid::btUuid16Create(bt_uuid_t *btuuid, uint16_t value)
     return 0;
 }
 
-int BtUuid::btUuid32Create(bt_uuid_t *btuuid, uint32_t value)
+int BtUuid::btUuid32Create(bt_uuid_t *btuuid, quint32 value)
 {
     memset(btuuid, 0, sizeof(bt_uuid_t));
     btuuid->type = bt_uuid_t::BT_UUID32;

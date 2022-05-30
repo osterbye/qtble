@@ -6,12 +6,13 @@
 #include <QString>
 #include <QVector>
 
+class Advertising;
 class BleCharacteristic;
 class BleService;
-class Advertising;
 class BtAtt;
 class BtSocket;
 class BtUuid;
+class GapService;
 class QtBleAuth;
 class QtBleValue;
 
@@ -32,13 +33,9 @@ public:
     GATT_SERVER_STATE state();
     void start();
     void stop();
-    // void addGattService(gattService *service);
 
 signals:
     void gattStateChanged(GATT_SERVER_STATE state);
-
-    // public slots:
-    // void btStateChanged(BT_STATE state);
 
 private slots:
     void startService();
@@ -48,16 +45,8 @@ private slots:
 private:
     bool createServer();
     void destroyServer();
-    void createGapService();
     void createCustomServices();
     void setState(GATT_SERVER_STATE state);
-    static void confirm_write(struct gatt_db_attribute *attr, int err, void *user_data);
-    /*static void gap_device_name_read_cb(struct gatt_db_attribute *attrib, unsigned int id,
-                                        uint16_t offset, uint8_t opcode, struct bt_att *att,
-                                        void *user_data);
-    static void gap_device_name_ext_prop_read_cb(struct gatt_db_attribute *attrib, unsigned int id,
-                                                 uint16_t offset, uint8_t opcode,
-                                                 struct bt_att *att, void *user_data);*/
 
 private:
     Advertising *m_advertising;
@@ -72,12 +61,8 @@ private:
     QVector<gattService *> m_services;
     QVector<BleCharacteristic *> m_characteristics;
     QVector<BleService *> m_customServices;
-    QString m_deviceName;
-    QString m_deviceManufacturer;
-    quint16 m_deviceAppearance;
+    GapService *m_gapService;
     QtBleAuth *m_authAlwaysAllowed;
-
-    // static QString m_deviceName;
 };
 
 #endif // GATTSERVER_H

@@ -29,6 +29,7 @@ SOURCES += \
     src/btatt.cpp \
     src/btsocket.cpp \
     src/btuuid.cpp \
+    src/gapservice.cpp \
     src/gattserver.cpp \
     src/qtble.cpp \
     src/qtblevalue.cpp
@@ -40,6 +41,7 @@ HEADERS += \
     src/btatt.h \
     src/btsocket.h \
     src/btuuid.h \
+    src/gapservice.h \
     src/gattserver.h \
     src/gattservice.h
 

@@ -16,6 +16,7 @@ extern "C" {
 #include "btatt.h"
 #include "btsocket.h"
 #include "btuuid.h"
+#include "gapservice.h"
 
 #include <QTimer>
 #include <qplatformdefs.h>
@@ -40,9 +41,6 @@ GattServer::GattServer(QString deviceName, QString deviceManufacturer, quint16 d
       m_gattDb(nullptr),
       m_gatt(nullptr),
       m_startRequested(false),
-      m_deviceName(deviceName),
-      m_deviceManufacturer(deviceManufacturer),
-      m_deviceAppearance(deviceAppearance),
       m_authAlwaysAllowed(nullptr)
 {
     m_advertising = new Advertising(this);
@@ -50,6 +48,7 @@ GattServer::GattServer(QString deviceName, QString deviceManufacturer, quint16 d
     m_btSocket = new BtSocket(this);
     m_btUuid = new BtUuid(this);
     connect(m_btAtt, &BtAtt::clientDisconnected, this, &GattServer::clientDisconnected);
+    m_gapService = new GapService(deviceName, deviceManufacturer, deviceAppearance, this);
     m_state = GATT_STATE_OFF;
 }
 
@@ -129,19 +128,6 @@ void GattServer::stop()
     }
 }
 
-/*void GattServer::addGattService(gattService *service)
-{
-    GS_D(__PRETTY_FUNCTION__ << ", uuid:" << service->serviceUuid.attributeUuid);
-    m_services.append(service);
-}*/
-
-/*void GattServer::btStateChanged(BT_STATE state)
-{
-    GS_D(__PRETTY_FUNCTION__);
-    if (m_startRequested && BT_STATE_ON == state && m_state < GATT_STATE_WAITING_FOR_CLIENT)
-        startService();
-}*/
-
 void GattServer::startService()
 {
     GS_D(__PRETTY_FUNCTION__);
@@ -151,7 +137,7 @@ void GattServer::startService()
     m_advertising->setLeAdvertising(false);
     m_advertising->setLeAdvertisingParameters();
     m_advertising->setLeAdvertising(true);
-    m_advertising->setLeAdvertisingData(m_deviceName);
+    m_advertising->setLeAdvertisingData(m_gapService->deviceName());
 
     setState(GATT_STATE_WAITING_FOR_CLIENT);
     m_fdClient = m_btSocket->waitForClient();
@@ -168,7 +154,7 @@ void GattServer::startService()
         return;
     }
 
-    createGapService();
+    m_gapService->create(m_gattDb, m_btUuid);
     createCustomServices();
 
     setState(GATT_STATE_CONNECTED);
@@ -249,43 +235,6 @@ void GattServer::destroyServer()
         delete m_customServices.takeLast();
 }
 
-void GattServer::createGapService()
-{
-    GS_D(__PRETTY_FUNCTION__);
-    /*
-        bt_uuid_t uuid;
-        struct gatt_db_attribute *service, *tmp;
-        quint16 appearance;
-        const char *manufacturer = "Paralenz\0";
-
-        m_btUuid->btUuid16Create(&uuid, UUID_GAP);
-        service = gatt_db_add_service(m_gattDb, &uuid, true, 8);
-
-        m_btUuid->btUuid16Create(&uuid, GATT_CHARAC_DEVICE_NAME);
-        gatt_db_service_add_characteristic(service, &uuid, BT_ATT_PERM_READ, BT_GATT_CHRC_PROP_READ,
-                                           gap_device_name_read_cb, NULL, NULL);
-
-        m_btUuid->btUuid16Create(&uuid, GATT_CHARAC_EXT_PROPER_UUID);
-        gatt_db_service_add_descriptor(service, &uuid, BT_ATT_PERM_READ,
-                                       gap_device_name_ext_prop_read_cb, NULL, NULL);
-
-        m_btUuid->btUuid16Create(&uuid, GATT_CHARAC_APPEARANCE);
-        tmp = gatt_db_service_add_characteristic(service, &uuid, BT_ATT_PERM_READ,
-                                                 BT_GATT_CHRC_PROP_READ, NULL, NULL, NULL);
-        put_le16(0x1440, &appearance);
-        gatt_db_attribute_write(tmp, 0, (quint8 *)&appearance, sizeof(appearance),
-       BT_ATT_OP_WRITE_REQ, NULL, confirm_write, NULL);
-
-        m_btUuid->btUuid16Create(&uuid, GATT_CHARAC_MANUFACTURER);
-        struct gatt_db_attribute *manu = gatt_db_service_add_characteristic(
-                service, &uuid, BT_ATT_PERM_READ, BT_GATT_CHRC_PROP_READ, NULL, NULL, NULL);
-        gatt_db_attribute_write(manu, 0, (quint8 *)manufacturer, sizeof(manufacturer),
-                                BT_ATT_OP_WRITE_REQ, NULL, confirm_write, NULL);
-
-        gatt_db_service_set_active(service, true);
-    */
-}
-
 void GattServer::createCustomServices()
 {
     GS_D(__PRETTY_FUNCTION__ << ": " << m_services.count() << " services");
@@ -301,61 +250,3 @@ void GattServer::setState(GATT_SERVER_STATE state)
     m_state = state;
     emit gattStateChanged(m_state);
 }
-
-void GattServer::confirm_write(struct gatt_db_attribute *attr, int err, void *user_data)
-{
-    Q_UNUSED(user_data)
-    if (!err)
-        return;
-
-    qWarning("[GattServer] Error caching attribute %p - err: %d\n", attr, err);
-}
-/*
-void GattServer::gap_device_name_read_cb(struct gatt_db_attribute *attrib, unsigned int id,
-                                         uint16_t offset, uint8_t opcode, struct bt_att *att,
-                                         void *user_data)
-{
-    Q_UNUSED(opcode)
-    Q_UNUSED(att)
-    Q_UNUSED(user_data)
-    QByteArray ba;
-
-    uint8_t error = 0;
-    size_t len = 0;
-    const uint8_t *value = NULL;
-
-    GS_D("GAP Device Name Read called");
-
-    len = GattServer::m_deviceName.size();
-    if (offset > len) {
-        GS_D("Error: offset (" << offset << ") > len (" << len << ")");
-        error = BT_ATT_ERROR_INVALID_OFFSET;
-        goto done;
-    }
-
-    len -= offset;
-    ba = GattServer::m_deviceName.toLatin1();
-    value = len ? (const uint8_t *)ba.constData() : NULL;
-
-done:
-    gatt_db_attribute_read_result(attrib, id, error, value, len);
-}
-
-void GattServer::gap_device_name_ext_prop_read_cb(struct gatt_db_attribute *attrib, unsigned int id,
-                                                  uint16_t offset, uint8_t opcode,
-                                                  struct bt_att *att, void *user_data)
-{
-    Q_UNUSED(offset)
-    Q_UNUSED(opcode)
-    Q_UNUSED(att)
-    Q_UNUSED(user_data)
-    uint8_t value[2];
-
-    GS_D("Device Name Extended Properties Read called");
-
-    value[0] = BT_GATT_CHRC_EXT_PROP_RELIABLE_WRITE;
-    value[1] = 0;
-
-    gatt_db_attribute_read_result(attrib, id, 0, value, sizeof(value));
-}
-*/

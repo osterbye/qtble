@@ -24,8 +24,8 @@ class BtUuid : public QObject
 public:
     explicit BtUuid(QObject *parent = nullptr);
 
-    int btUuid16Create(bt_uuid_t *btuuid, uint16_t value);
-    int btUuid32Create(bt_uuid_t *btuuid, uint32_t value);
+    int btUuid16Create(bt_uuid_t *btuuid, quint16 value);
+    int btUuid32Create(bt_uuid_t *btuuid, quint32 value);
     int btUuid128Create(bt_uuid_t *btuuid, uint128_t value);
     int btUuid128Create(bt_uuid_t *btuuid, QVector<quint8> value);
 };
