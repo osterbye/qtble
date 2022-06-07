@@ -22,12 +22,12 @@ int main(int argc, char *argv[])
     QtBle qtBle(argv[1], argv[2]);
     uuid128 serviceUuid;
 
-    serviceUuid.attributeUuid = { 0x00, 0x00, 0x51, 0xda, 0xcd, 0xbd, 0x4e, 0xad,
-                                  0x99, 0xc8, 0xf2, 0x1d, 0x1e, 0xbb, 0x2f, 0x6d };
+    serviceUuid.value = { 0x00, 0x00, 0x51, 0xda, 0xcd, 0xbd, 0x4e, 0xad,
+                          0x99, 0xc8, 0xf2, 0x1d, 0x1e, 0xbb, 0x2f, 0x6d };
     qtBle.createGattService(serviceUuid);
 
     uuid128 characteristicUuid = serviceUuid;
-    characteristicUuid.attributeUuid[0] = 0x01;
+    characteristicUuid.value[0] = 0x01;
     QtBleValue characteristic(characteristicUuid, QtBleValue::PERM_READ, QtBleValue::NOTI_NONE,
                               "Hello world");
     qtBle.addCharacteristicToService(serviceUuid, &characteristic);

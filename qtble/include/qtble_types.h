@@ -15,11 +15,10 @@ enum GATT_SERVER_STATE {
 Q_DECLARE_METATYPE(GATT_SERVER_STATE);
 
 struct uuid128 {
-    QVector<quint8> attributeUuid;
-    bool operator==(const uuid128 &a) const { return (attributeUuid == a.attributeUuid); }
+    QVector<quint8> value;
+    uuid128() { value = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }; };
+    uuid128(QVector<quint8> v) { value = v; };
+    bool operator==(const uuid128 &a) const { return (value == a.value); }
 };
-
-const int uuidServiceIndex = 2;
-const int uuidCharacteristicIndex = 3;
 
 #endif // QTBLE_TYPES_H

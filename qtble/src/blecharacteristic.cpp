@@ -22,10 +22,10 @@ BleCharacteristic::BleCharacteristic(QtBleValue *value, QtBleAuth *auth, bt_gatt
                                      BtUuid *btUuid, gatt_db_attribute *service, QObject *parent)
     : QObject(parent), p_value(value), p_auth(auth), p_gatt(server), m_ccc(0)
 {
-    BLEC_D(value->getUuid().attributeUuid);
+    BLEC_D(value->getUuid().value);
     bt_uuid_t characUuid;
     struct gatt_db_attribute *attr;
-    btUuid->btUuid128Create(&characUuid, value->getUuid().attributeUuid);
+    btUuid->btUuid128Create(&characUuid, value->getUuid().value);
     quint32 permissions = 0;
     quint8 properties = 0;
     switch (value->accessPermissions()) {

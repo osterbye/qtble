@@ -21,9 +21,9 @@ BleService::BleService(bt_gatt_server *server, gatt_db *gattDb, BtUuid *btUuid, 
 {
     bt_uuid_t uuid;
     struct gatt_db_attribute *service;
-    BLES_D("Service UUID:" << srvc->serviceUuid.attributeUuid);
+    BLES_D("Service UUID:" << srvc->serviceUuid.value);
 
-    btUuid->btUuid128Create(&uuid, srvc->serviceUuid.attributeUuid);
+    btUuid->btUuid128Create(&uuid, srvc->serviceUuid.value);
     service = gatt_db_add_service(gattDb, &uuid, true, (srvc->values.count() * 2) + 4);
 
     BLES_D("Number of characteristics:" << srvc->values.count());
