@@ -4,8 +4,7 @@ CONFIG += console
 CONFIG -= app_bundle
 
 INCLUDEPATH += $$_PRO_FILE_PWD_/../../qtble/include
-LIBS += -L$$_PRO_FILE_PWD_/../../bin
-LIBS += -lqtble
+LIBS += -L"$$_PRO_FILE_PWD_/../../bin" -lqtble
 
 SOURCES += \
         main.cpp

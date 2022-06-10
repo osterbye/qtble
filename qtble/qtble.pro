@@ -1,12 +1,15 @@
 QT -= gui
+QMAKE_CXXFLAGS += -Wno-deprecated-copy
 
 VERSION = 1.0.0
 TEMPLATE = lib
 DEFINES += QTBLE_LIBRARY
 
-CONFIG += c++11
 QMAKE_CXXFLAGS += -Wall -Wextra
 DEFINES += QT_DEPRECATED_WARNINGS
+
+CONFIG += link_pkgconfig
+PKGCONFIG += glib-2.0
 
 INCLUDEPATH += \
     include/ \
@@ -43,18 +46,20 @@ HEADERS += \
     src/btuuid.h \
     src/gapservice.h \
     src/gattserver.h \
-    src/gattservice.h \
-    src/uuid.h \
-    src/uuid-types.h
+    src/gattservice.h
 
-#LIBS +=  -L"$$_PRO_FILE_PWD_/../local-lib" -Wl,--whole-archive -lshared-glib -Wl,--no-whole-archive -lbluetooth
-#LIBS += -lbluetooth -lshared-glib
-LIBS += -L"$$_PRO_FILE_PWD_/../local-lib" -lshared-glib -lbluetooth
-QMAKE_CXXFLAGS += -Wno-deprecated-copy
-#QMAKE_RPATHDIR += "$$_PRO_FILE_PWD_/../local-lib"
+SOURCES += \
+    $$_PRO_FILE_PWD_/../bluez/src/shared/att.c \
+    $$_PRO_FILE_PWD_/../bluez/src/shared/crypto.c \
+    $$_PRO_FILE_PWD_/../bluez/src/shared/gatt-db.c \
+    $$_PRO_FILE_PWD_/../bluez/src/shared/gatt-server.c \
+    $$_PRO_FILE_PWD_/../bluez/src/shared/io-glib.c \
+    $$_PRO_FILE_PWD_/../bluez/src/shared/queue.c \
+    $$_PRO_FILE_PWD_/../bluez/src/shared/timeout-glib.c \
+    $$_PRO_FILE_PWD_/../bluez/src/shared/util.c
 
-# For local build of BlueZ
-#LIBS += -L"$$_PRO_FILE_PWD_/../local-lib"
+SOURCES += \
+    $$_PRO_FILE_PWD_/../bluez/lib/uuid.c \
 
 DESTDIR = $$_PRO_FILE_PWD_/../bin/
 OBJECTS_DIR = $$_PRO_FILE_PWD_/../build/.obj
