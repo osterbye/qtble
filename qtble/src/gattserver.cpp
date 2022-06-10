@@ -1,13 +1,4 @@
 #include "gattserver.h"
-
-// BlueZ shared local copy
-extern "C" {
-#include "uuid.h"
-#include "src/shared/gatt-db.h"
-#include "src/shared/gatt-server.h"
-}
-
-#include "qtbleauth.h"
 #include "advertising.h"
 #include "blecharacteristic.h"
 #include "bleservice.h"
@@ -15,9 +6,16 @@ extern "C" {
 #include "btsocket.h"
 #include "btuuid.h"
 #include "gapservice.h"
+#include "qtbleauth.h"
 
 #include <QTimer>
 #include <qplatformdefs.h>
+
+// BlueZ shared local copy
+extern "C" {
+#include "src/shared/gatt-db.h"
+#include "src/shared/gatt-server.h"
+}
 
 #define GS_DEBUG
 #if defined GS_DEBUG
@@ -32,8 +30,8 @@ static void debugCallback(const char *str, void *user_data)
 #define GS_D(x)
 #endif
 
-GattServer::GattServer(QString deviceName, QString deviceManufacturer, quint16 deviceAppearance,
-                       QObject *parent)
+GattServer::GattServer(QString deviceName, QString storagePath, QString deviceManufacturer,
+                       quint16 deviceAppearance, QObject *parent)
     : QObject(parent),
       m_fdClient(-1),
       m_gattDb(nullptr),
@@ -46,7 +44,8 @@ GattServer::GattServer(QString deviceName, QString deviceManufacturer, quint16 d
     m_btSocket = new BtSocket(this);
     m_btUuid = new BtUuid(this);
     connect(m_btAtt, &BtAtt::clientDisconnected, this, &GattServer::clientDisconnected);
-    m_gapService = new GapService(deviceName, deviceManufacturer, deviceAppearance, this);
+    m_gapService =
+            new GapService(deviceName, storagePath, deviceManufacturer, deviceAppearance, this);
     m_state = GATT_STATE_OFF;
 }
 

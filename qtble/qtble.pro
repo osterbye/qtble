@@ -11,7 +11,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 INCLUDEPATH += \
     include/ \
     src/ \
-    bluez-5.41/
+    $$_PRO_FILE_PWD_/../bluez/
 
 # Public headers
 HEADERS += \
@@ -43,9 +43,18 @@ HEADERS += \
     src/btuuid.h \
     src/gapservice.h \
     src/gattserver.h \
-    src/gattservice.h
+    src/gattservice.h \
+    src/uuid.h \
+    src/uuid-types.h
 
-LIBS += -lbluetooth -lshared-glib
+#LIBS +=  -L"$$_PRO_FILE_PWD_/../local-lib" -Wl,--whole-archive -lshared-glib -Wl,--no-whole-archive -lbluetooth
+#LIBS += -lbluetooth -lshared-glib
+LIBS += -L"$$_PRO_FILE_PWD_/../local-lib" -lshared-glib -lbluetooth
+QMAKE_CXXFLAGS += -Wno-deprecated-copy
+#QMAKE_RPATHDIR += "$$_PRO_FILE_PWD_/../local-lib"
+
+# For local build of BlueZ
+#LIBS += -L"$$_PRO_FILE_PWD_/../local-lib"
 
 DESTDIR = $$_PRO_FILE_PWD_/../bin/
 OBJECTS_DIR = $$_PRO_FILE_PWD_/../build/.obj

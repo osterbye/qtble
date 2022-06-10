@@ -1,13 +1,14 @@
 #include "qtble.h"
 #include "gattserver.h"
 
-QtBle::QtBle(QString deviceName, QString deviceManufacturer, quint16 deviceAppearance,
-             QObject *parent)
+QtBle::QtBle(QString deviceName, QString storagePath, QString deviceManufacturer,
+             quint16 deviceAppearance, QObject *parent)
     : QObject(parent)
 {
     qRegisterMetaType<GATT_SERVER_STATE>();
 
-    m_gattServer = new GattServer(deviceName, deviceManufacturer, deviceAppearance, this);
+    m_gattServer =
+            new GattServer(deviceName, storagePath, deviceManufacturer, deviceAppearance, this);
     connect(m_gattServer, &GattServer::gattStateChanged, this, &QtBle::gattStateChanged);
 }
 

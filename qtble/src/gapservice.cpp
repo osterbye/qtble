@@ -1,6 +1,8 @@
 #include "gapservice.h"
 #include "btuuid.h"
 
+#include <QFile>
+
 // BlueZ shared local copy
 extern "C" {
 #include "src/shared/att.h"
@@ -16,13 +18,26 @@ extern "C" {
 #define GAP_D(x)
 #endif
 
-GapService::GapService(QString deviceName, QString deviceManufacturer, quint16 deviceAppearance,
-                       QObject *parent)
+#define DEVICE_NAME_FILE "/bledevicename"
+
+GapService::GapService(QString deviceName, QString storagePath, QString deviceManufacturer,
+                       quint16 deviceAppearance, QObject *parent)
     : QObject(parent),
       m_deviceName(deviceName),
+      m_storagePath(storagePath),
       m_deviceManufacturer(deviceManufacturer),
       m_deviceAppearance(deviceAppearance)
 {
+    if (!m_storagePath.isEmpty()) {
+        GAP_D("Storage path:" << m_storagePath);
+        QFile f(m_storagePath + DEVICE_NAME_FILE);
+        if (f.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            QByteArray input = f.readLine();
+            f.close();
+            if (!input.isEmpty())
+                m_deviceName = input;
+        }
+    }
 }
 
 void GapService::create(gatt_db *gattDb, BtUuid *btUuid)
@@ -30,32 +45,44 @@ void GapService::create(gatt_db *gattDb, BtUuid *btUuid)
     bt_uuid_t uuid;
     struct gatt_db_attribute *service, *tmp;
     quint16 appearance;
-    QByteArray manufacturer = m_deviceManufacturer.toLatin1();
 
     btUuid->btUuid16Create(&uuid, UUID_GAP);
+    //bt_uuid16_create(&uuid, UUID_GAP);
     service = gatt_db_add_service(gattDb, &uuid, true, 8);
 
     btUuid->btUuid16Create(&uuid, GATT_CHARAC_DEVICE_NAME);
-    gatt_db_service_add_characteristic(service, &uuid, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
-                                       BT_GATT_CHRC_PROP_READ | BT_GATT_CHRC_PROP_EXT_PROP,
-                                       readName, writeName, this);
+    if (m_storagePath.isEmpty()) {
+        gatt_db_service_add_characteristic(service, &uuid, BT_ATT_PERM_READ, BT_GATT_CHRC_PROP_READ,
+                                           readName, NULL, this);
 
-    btUuid->btUuid16Create(&uuid, GATT_CHARAC_EXT_PROPER_UUID);
-    gatt_db_service_add_descriptor(service, &uuid, BT_ATT_PERM_READ, readNameExtProps, NULL, NULL);
+    } else {
+        gatt_db_service_add_characteristic(service, &uuid, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
+                                           BT_GATT_CHRC_PROP_READ | BT_GATT_CHRC_PROP_EXT_PROP,
+                                           readName, writeName, this);
 
-    btUuid->btUuid16Create(&uuid, GATT_CHARAC_APPEARANCE);
-    tmp = gatt_db_service_add_characteristic(service, &uuid, BT_ATT_PERM_READ,
-                                             BT_GATT_CHRC_PROP_READ, NULL, NULL, NULL);
-    put_le16(m_deviceAppearance, &appearance);
-    gatt_db_attribute_write(tmp, 0, (quint8 *)&appearance, sizeof(appearance), BT_ATT_OP_WRITE_REQ,
-                            NULL, confirmAttrWrite, NULL);
+        btUuid->btUuid16Create(&uuid, GATT_CHARAC_EXT_PROPER_UUID);
+        gatt_db_service_add_descriptor(service, &uuid, BT_ATT_PERM_READ, readNameExtProps, NULL,
+                                       NULL);
+    }
 
-    btUuid->btUuid16Create(&uuid, GATT_CHARAC_MANUFACTURER);
-    struct gatt_db_attribute *manu = gatt_db_service_add_characteristic(
-            service, &uuid, BT_ATT_PERM_READ, BT_GATT_CHRC_PROP_READ, NULL, NULL, NULL);
-    gatt_db_attribute_write(manu, 0, (quint8 *)manufacturer.constData(),
-                            sizeof(manufacturer.constData()), BT_ATT_OP_WRITE_REQ, NULL,
-                            confirmAttrWrite, NULL);
+    if (0 != m_deviceAppearance) {
+        btUuid->btUuid16Create(&uuid, GATT_CHARAC_APPEARANCE);
+        tmp = gatt_db_service_add_characteristic(service, &uuid, BT_ATT_PERM_READ,
+                                                 BT_GATT_CHRC_PROP_READ, NULL, NULL, NULL);
+        put_le16(m_deviceAppearance, &appearance);
+        gatt_db_attribute_write(tmp, 0, (quint8 *)&appearance, sizeof(appearance),
+                                BT_ATT_OP_WRITE_REQ, NULL, confirmAttrWrite, NULL);
+    }
+
+    if (!m_deviceManufacturer.isEmpty()) {
+        QByteArray manufacturer = m_deviceManufacturer.toLatin1();
+        btUuid->btUuid16Create(&uuid, GATT_CHARAC_MANUFACTURER_NAME_STRING);
+        struct gatt_db_attribute *manu = gatt_db_service_add_characteristic(
+                service, &uuid, BT_ATT_PERM_READ, BT_GATT_CHRC_PROP_READ, NULL, NULL, NULL);
+        gatt_db_attribute_write(manu, 0, (quint8 *)manufacturer.constData(),
+                                sizeof(manufacturer.constData()), BT_ATT_OP_WRITE_REQ, NULL,
+                                confirmAttrWrite, NULL);
+    }
 
     gatt_db_service_set_active(service, true);
 }
@@ -67,7 +94,17 @@ const QString &GapService::deviceName()
 
 void GapService::saveNewDeviceName(QString name)
 {
-    // TODO: save new name to permanent storage
+    if (!m_storagePath.isEmpty()) {
+        QFile f(m_storagePath + DEVICE_NAME_FILE);
+        if (name.isEmpty()) {
+            f.remove();
+        } else {
+            if (f.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+                f.write(name.toLatin1());
+                f.close();
+            }
+        }
+    }
 }
 
 void GapService::confirmAttrWrite(struct gatt_db_attribute *attr, int err, void *user_data)

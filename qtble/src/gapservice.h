@@ -12,8 +12,8 @@ class GapService : public QObject
 {
     Q_OBJECT
 public:
-    explicit GapService(QString deviceName, QString deviceManufacturer, quint16 deviceAppearance,
-                        QObject *parent = nullptr);
+    explicit GapService(QString deviceName, QString storagePath, QString deviceManufacturer,
+                        quint16 deviceAppearance, QObject *parent = nullptr);
 
     void create(gatt_db *gattDb, BtUuid *btUuid);
     const QString &deviceName();
@@ -31,6 +31,7 @@ private:
 
 private:
     QString m_deviceName;
+    QString m_storagePath;
     QString m_deviceManufacturer;
     quint16 m_deviceAppearance;
 };

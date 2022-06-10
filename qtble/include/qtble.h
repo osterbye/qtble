@@ -15,7 +15,11 @@ class QTBLE_EXPORT QtBle : public QObject
 public:
     /**
      * @brief QtBle
-     * @param deviceName The name of your device.
+     * @param deviceName The default name of your device. If a storage path is provided remote
+     * devices will be allowed to change the device name.
+     * @param storagePath If you want to allow remote devices to change the name if your device,
+     * supply a path to a valid location where it can be stored. The name will be stored in a plain
+     * text file.
      * @param deviceManufacturer The name of you or your company. Leave as an empty string if you
      * don't want your device to have a manufacturer characteristic.
      * @param deviceAppearance Device appearance value. Look for valid values on
@@ -23,8 +27,8 @@ public:
      * device to have an appearance characteristic.
      * @param parent Qt parent, for easy garbage collection.
      */
-    QtBle(QString deviceName, QString deviceManufacturer = "", quint16 deviceAppearance = 0,
-          QObject *parent = nullptr);
+    QtBle(QString deviceName, QString storagePath = "", QString deviceManufacturer = "",
+          quint16 deviceAppearance = 0, QObject *parent = nullptr);
 
     /**
      * @brief Create a GATT service. New services will only be visible if created before server is

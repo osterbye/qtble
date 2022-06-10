@@ -23,8 +23,8 @@ class GattServer : public QObject
 {
     Q_OBJECT
 public:
-    explicit GattServer(QString deviceName, QString deviceManufacturer, quint16 deviceAppearance,
-                        QObject *parent = nullptr);
+    explicit GattServer(QString deviceName, QString storagePath, QString deviceManufacturer,
+                        quint16 deviceAppearance, QObject *parent = nullptr);
     ~GattServer();
 
     bool createService(uuid128 uuid, QtBleAuth *authenticator);
