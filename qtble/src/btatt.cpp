@@ -1,6 +1,6 @@
 #include "btatt.h"
 
-// BlueZ shared local copy
+// BlueZ
 extern "C" {
 #include "src/shared/att.h"
 }

@@ -1,9 +1,8 @@
 #include "gapservice.h"
 #include "btuuid.h"
-
 #include <QFile>
 
-// BlueZ shared local copy
+// BlueZ
 extern "C" {
 #include "src/shared/att.h"
 #include "src/shared/gatt-db.h"

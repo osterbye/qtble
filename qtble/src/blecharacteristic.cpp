@@ -3,7 +3,7 @@
 #include "qtblevalue.h"
 #include "btuuid.h"
 
-// BlueZ shared local copy
+// BlueZ
 extern "C" {
 #include "src/shared/att-types.h"
 #include "src/shared/gatt-db.h"

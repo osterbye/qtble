@@ -2,7 +2,7 @@
 #include "btuuid.h"
 #include "blecharacteristic.h"
 
-// BlueZ shared local copy
+// BlueZ
 extern "C" {
 #include "src/shared/gatt-db.h"
 }

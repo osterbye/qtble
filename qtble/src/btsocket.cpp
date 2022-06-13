@@ -1,18 +1,28 @@
 #include "btsocket.h"
+#include <qplatformdefs.h>
 
 // BlueZ
-#include <bluetooth/bluetooth.h>
-#include <bluetooth/l2cap.h>
-
-// Qt
-#include <qplatformdefs.h>
+extern "C" {
+#include <src/shared/bluetooth-definitions.h>
+#include <src/shared/l2cap-definitions.h>
+}
 
 #define BS_DEBUG
 #if defined BS_DEBUG
 #include <QDebug>
 #define BS_D(x) qDebug() << "[BtSocket] " << x
+#define BS_ADDR_D(b) qDebug("[BtSocket] %2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X", b[5], b[4], b[3], b[2], b[1], b[0])
 #else
 #define BS_D(x)
+#define BS_ADDR_D(b)
+#endif
+
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+#define le16_to_cpu(val) (val)
+#elif __BYTE_ORDER == __BIG_ENDIAN
+#define le16_to_cpu(val) bswap_16(val)
+#else
+#error "Unknown byte order"
 #endif
 
 #define ATT_CID 4
@@ -42,9 +52,9 @@ int BtSocket::waitForClient()
     struct sockaddr_l2 srcaddr;
     memset(&srcaddr, 0, sizeof(srcaddr));
     srcaddr.l2_family = AF_BLUETOOTH;
-    srcaddr.l2_cid = htobs(ATT_CID);
+    srcaddr.l2_cid = le16_to_cpu(ATT_CID);
     srcaddr.l2_bdaddr_type = BDADDR_LE_PUBLIC;
-    bacpy(&srcaddr.l2_bdaddr, &bd_any);
+    memcpy(&srcaddr.l2_bdaddr, &bd_any, sizeof(bdaddr_t));
 
     if (bind(l2capSocket, (struct sockaddr *)&srcaddr, sizeof(srcaddr)) < 0) {
         BS_D("Failed to bind L2CAP socket");
@@ -102,11 +112,8 @@ int BtSocket::waitForClient()
         return -1;
     }
 
-#ifdef BS_DEBUG
-    char ba[18];
-    ba2str(&addr.l2_bdaddr, ba);
-    BS_D("Connect from " << ba);
-#endif
+    BS_D("Connect from: ");
+    BS_ADDR_D(addr.l2_bdaddr.b);
 
     if (l2capSocket >= 0)
         QT_CLOSE(l2capSocket);

@@ -7,11 +7,10 @@
 #include "btuuid.h"
 #include "gapservice.h"
 #include "qtbleauth.h"
-
 #include <QTimer>
 #include <qplatformdefs.h>
 
-// BlueZ shared local copy
+// BlueZ
 extern "C" {
 #include "src/shared/gatt-db.h"
 #include "src/shared/gatt-server.h"

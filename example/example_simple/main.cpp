@@ -1,8 +1,5 @@
 #include <QCoreApplication>
 #include <QDebug>
-#include <QFile>
-#include <QImage>
-#include <QString>
 #include "qtble.h"
 #include "qtblevalue.h"
 

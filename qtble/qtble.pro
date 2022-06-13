@@ -48,6 +48,7 @@ HEADERS += \
     src/gattserver.h \
     src/gattservice.h
 
+# BlueZ shared LGPL
 SOURCES += \
     $$_PRO_FILE_PWD_/../bluez/src/shared/att.c \
     $$_PRO_FILE_PWD_/../bluez/src/shared/crypto.c \
@@ -56,10 +57,23 @@ SOURCES += \
     $$_PRO_FILE_PWD_/../bluez/src/shared/io-glib.c \
     $$_PRO_FILE_PWD_/../bluez/src/shared/queue.c \
     $$_PRO_FILE_PWD_/../bluez/src/shared/timeout-glib.c \
-    $$_PRO_FILE_PWD_/../bluez/src/shared/util.c
+    $$_PRO_FILE_PWD_/../bluez/src/shared/util.c \
+    $$_PRO_FILE_PWD_/../bluez/src/shared/uuid.c
 
-SOURCES += \
-    $$_PRO_FILE_PWD_/../bluez/lib/uuid.c \
+HEADERS += \
+    $$_PRO_FILE_PWD_/../bluez/src/shared/att.h \
+    $$_PRO_FILE_PWD_/../bluez/src/shared/bluetooth-definitions.h \
+    $$_PRO_FILE_PWD_/../bluez/src/shared/crypto.h \
+    $$_PRO_FILE_PWD_/../bluez/src/shared/gatt-db.h \
+    $$_PRO_FILE_PWD_/../bluez/src/shared/gatt-server.h \
+    $$_PRO_FILE_PWD_/../bluez/src/shared/gatt-helpers.h \
+    $$_PRO_FILE_PWD_/../bluez/src/shared/io.h \
+    $$_PRO_FILE_PWD_/../bluez/src/shared/l2cap-definitions.h \
+    $$_PRO_FILE_PWD_/../bluez/src/shared/queue.h \
+    $$_PRO_FILE_PWD_/../bluez/src/shared/timeout.h \
+    $$_PRO_FILE_PWD_/../bluez/src/shared/util.h \
+    $$_PRO_FILE_PWD_/../bluez/src/shared/uuid.h
+
 
 DESTDIR = $$_PRO_FILE_PWD_/../bin/
 OBJECTS_DIR = $$_PRO_FILE_PWD_/../build/.obj

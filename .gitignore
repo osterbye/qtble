@@ -72,3 +72,5 @@ Thumbs.db
 *.exe
 
 bin/
+bluez/
+pkg-config_wrapper.sh

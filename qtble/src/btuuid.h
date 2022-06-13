@@ -4,8 +4,10 @@
 #include <QObject>
 #include <QVector>
 
-#include "lib/bluetooth.h"
-#include "lib/uuid.h"
+// BlueZ
+extern "C" {
+#include "src/shared/uuid.h"
+}
 
 #define UUID_GAP 0x1800
 #define GATT_CHARAC_DEVICE_NAME				0x2A00
