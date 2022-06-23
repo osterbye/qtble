@@ -126,17 +126,18 @@ void GapService::readName(struct gatt_db_attribute *attrib, unsigned int id, qui
     const quint8 *value = NULL;
     size_t len = 0;
     GapService *t = static_cast<GapService *>(user_data);
+    QByteArray name = t->m_deviceName.toLatin1();
 
-    if (offset >= t->m_deviceName.length())
+    if (offset >= name.length())
         error = BT_ATT_ERROR_INVALID_OFFSET;
 
     if (0 == error) {
-        len = t->m_deviceName.length();
+        len = name.length();
         len -= offset;
-        value = reinterpret_cast<const quint8 *>(t->m_deviceName.toLatin1().constData());
+        value = reinterpret_cast<const quint8 *>(name.constData());
         value += offset;
     } else {
-        GAP_D("Error: read offset:" << offset << ">=" << t->m_deviceName.length());
+        GAP_D("Error: read offset:" << offset << ">=" << name.length());
     }
     gatt_db_attribute_read_result(attrib, id, error, value, len);
 }
