@@ -1,12 +1,10 @@
 QT -= gui
-QMAKE_CXXFLAGS += -Wno-deprecated-copy
 
 VERSION = 1.0.0
 TEMPLATE = lib
 DEFINES += QTBLE_LIBRARY
 
 QMAKE_CXXFLAGS += -Wall -Wextra
-DEFINES += QT_DEPRECATED_WARNINGS
 
 CONFIG += link_pkgconfig
 PKGCONFIG += glib-2.0
