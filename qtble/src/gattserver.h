@@ -31,6 +31,8 @@ public:
     bool addCharacteristicToService(uuid128 serviceUuid, QtBleValue *value);
     void clearServices();
     GATT_SERVER_STATE state();
+
+public slots:
     void start();
     void stop();
 
@@ -38,11 +40,11 @@ signals:
     void gattStateChanged(GATT_SERVER_STATE state);
 
 private slots:
-    void startService();
-    void stopService();
     void clientDisconnected();
 
 private:
+    void startService();
+    void stopService();
     bool createServer();
     void destroyServer();
     void createCustomServices();

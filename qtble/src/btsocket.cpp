@@ -11,7 +11,8 @@ extern "C" {
 #if defined BS_DEBUG
 #include <QDebug>
 #define BS_D(x) qDebug() << "[BtSocket] " << x
-#define BS_ADDR_D(b) qDebug("[BtSocket] %2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X", b[5], b[4], b[3], b[2], b[1], b[0])
+#define BS_ADDR_D(b)                                                                               \
+    qDebug("[BtSocket] %2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X", b[5], b[4], b[3], b[2], b[1], b[0])
 #else
 #define BS_D(x)
 #define BS_ADDR_D(b)

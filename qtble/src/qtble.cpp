@@ -1,5 +1,7 @@
 #include "qtble.h"
 #include "gattserver.h"
+#include <QThread>
+#include <QTimer>
 
 QtBle::QtBle(QString deviceName, QString storagePath, QString deviceManufacturer,
              quint16 deviceAppearance, QObject *parent)
@@ -7,8 +9,10 @@ QtBle::QtBle(QString deviceName, QString storagePath, QString deviceManufacturer
 {
     qRegisterMetaType<GATT_SERVER_STATE>();
 
-    m_gattServer =
-            new GattServer(deviceName, storagePath, deviceManufacturer, deviceAppearance, this);
+    m_gattServer = new GattServer(deviceName, storagePath, deviceManufacturer, deviceAppearance);
+    m_serverThread = new QThread(this);
+    m_gattServer->moveToThread(m_serverThread);
+    m_serverThread->start();
     connect(m_gattServer, &GattServer::gattStateChanged, this, &QtBle::gattStateChanged);
 }
 
@@ -34,10 +38,10 @@ GATT_SERVER_STATE QtBle::stateGatt()
 
 void QtBle::startGattServer()
 {
-    m_gattServer->start();
+    QTimer::singleShot(0, m_gattServer, &GattServer::start);
 }
 
 void QtBle::stopGattServer()
 {
-    m_gattServer->stop();
+    QTimer::singleShot(0, m_gattServer, &GattServer::stop);
 }

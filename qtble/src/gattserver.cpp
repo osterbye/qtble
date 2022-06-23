@@ -31,12 +31,7 @@ static void debugCallback(const char *str, void *user_data)
 
 GattServer::GattServer(QString deviceName, QString storagePath, QString deviceManufacturer,
                        quint16 deviceAppearance, QObject *parent)
-    : QObject(parent),
-      m_fdClient(-1),
-      m_gattDb(nullptr),
-      m_gatt(nullptr),
-      m_startRequested(false),
-      m_authAlwaysAllowed(nullptr)
+    : QObject(parent), m_fdClient(-1), m_gattDb(nullptr), m_gatt(nullptr), m_startRequested(false)
 {
     m_advertising = new Advertising(this);
     m_btAtt = new BtAtt(this);
@@ -45,6 +40,7 @@ GattServer::GattServer(QString deviceName, QString storagePath, QString deviceMa
     connect(m_btAtt, &BtAtt::clientDisconnected, this, &GattServer::clientDisconnected);
     m_gapService =
             new GapService(deviceName, storagePath, deviceManufacturer, deviceAppearance, this);
+    m_authAlwaysAllowed = new QtBleAuth(true, this);
     m_state = GATT_STATE_OFF;
 }
 
@@ -61,12 +57,9 @@ bool GattServer::createService(uuid128 uuid, QtBleAuth *authenticator)
             return false;
     }
 
-    if (nullptr == authenticator) {
-        if (nullptr == m_authAlwaysAllowed)
-            m_authAlwaysAllowed = new QtBleAuth(true, this);
-
+    if (nullptr == authenticator)
         authenticator = m_authAlwaysAllowed;
-    }
+
     gattService *service = new gattService();
     service->serviceUuid = uuid;
     service->authenticator = authenticator;
@@ -126,6 +119,14 @@ void GattServer::stop()
     }
 }
 
+void GattServer::clientDisconnected()
+{
+    GS_D(__PRETTY_FUNCTION__);
+    stopService();
+    setState(GATT_STATE_RESTARTING);
+    startService();
+}
+
 void GattServer::startService()
 {
     GS_D(__PRETTY_FUNCTION__);
@@ -174,14 +175,6 @@ void GattServer::stopService()
         QT_CLOSE(m_fdClient);
         m_fdClient = -1;
     }
-}
-
-void GattServer::clientDisconnected()
-{
-    GS_D(__PRETTY_FUNCTION__);
-    stopService();
-    setState(GATT_STATE_RESTARTING);
-    startService();
 }
 
 bool GattServer::createServer()

@@ -6,6 +6,7 @@
 
 class QtBleAuth;
 class QtBleValue;
+class QThread;
 class GattServer;
 
 class QTBLE_EXPORT QtBle : public QObject
@@ -81,6 +82,7 @@ signals:
 
 private:
     GattServer *m_gattServer;
+    QThread *m_serverThread;
 };
 
 #endif // QTBLE_H

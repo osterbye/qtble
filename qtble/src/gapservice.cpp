@@ -46,7 +46,6 @@ void GapService::create(gatt_db *gattDb, BtUuid *btUuid)
     quint16 appearance;
 
     btUuid->btUuid16Create(&uuid, UUID_GAP);
-    //bt_uuid16_create(&uuid, UUID_GAP);
     service = gatt_db_add_service(gattDb, &uuid, true, 8);
 
     btUuid->btUuid16Create(&uuid, GATT_CHARAC_DEVICE_NAME);
